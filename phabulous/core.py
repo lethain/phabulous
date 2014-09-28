@@ -11,7 +11,7 @@ def first_or_none(values):
     return values[0] if values else None
 
 
-class PhabulousStart(object):
+class Phabulous(object):
     "Shared base clas for Phabulous classes."
     def __init__(self, phabricator=None):
         "Initialize Phabulous object."
@@ -30,15 +30,36 @@ class PhabulousStart(object):
         if kwargs:
             data = self.phab.project.query(**kwargs).data.itervalues()
             return self._build(Project, data)
-        return {}
+        return []
 
     def project(self, **kwargs):
         "Retrieve a project."
         return first_or_none(self.projects(**self._pluralize(kwargs)))
 
+    def tasks(self, **kwargs):
+        "Retrieve tasks."
+        if kwargs:
+            data = self.phab.maniphest.query(**self.task_filters).itervalues()
+            return self._build(Task, data)
+        return []
+
+    def task(self, **kwargs):
+        "Retrieve task."
+        return first_or_none(self.tasks(**self._pluralize(kwargs)))
+
+    def users(self, **kwargs):
+        "Retrieve users."
+        if kwargs:
+            data = self.phab.user.query(**kwargs)
+            return self._build(User, data)
+        return []
+
+    def user(self, **kwargs):
+        "Retrieve user."
+        return first_or_none(self.users(**self._pluralize(kwargs)))
 
 
-class Task(PhabulousStart):
+class Task(Phabulous):
     "Wrapper around Maniphest task."
     def __init__(self, data, *args, **kwargs):
         "Initialize Task."
@@ -58,8 +79,7 @@ class Task(PhabulousStart):
     @lazy
     def owner(self):
         "Retrieve owner user for a task."
-        data = self.phab.user.query(phids=(self.data['ownerPHID'],))
-        return first_or_none(self._build(User, data))
+        return self.user(phid=self.data['ownerPHID'])
 
     @lazy
     def projects(self):
@@ -70,7 +90,7 @@ class Task(PhabulousStart):
         return "Task(T%s: %s)" % (self.id, self.title[:100])
 
 
-class User(PhabulousStart):
+class User(Phabulous):
     "Wrapper around Phabricator user responses."
     def __init__(self, data, *args, **kwargs):
         "Initialize phab user from API response."
@@ -86,14 +106,13 @@ class User(PhabulousStart):
     @lazy
     def tasks(self):
         "Retrieve tasks from Phabricator API for user."
-        data = self.phab.maniphest.query(**self.task_filters).itervalues()
-        return self._build(Task, data)
+        return super(User, self).tasks(**self.task_filters)
     
     def __repr__(self):
         return "User(%s)" % (self.name,)
 
 
-class Project(PhabulousStart):
+class Project(Phabulous):
     "A Phabricator project."
     def __init__(self, data, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
@@ -112,22 +131,13 @@ class Project(PhabulousStart):
     @lazy
     def tasks(self):
         "Retrieve tasks from Phabricator API for user."
-        data = self.phab.maniphest.query(**self.task_filters).itervalues()
-        return self._build(Task, data)
+        return super(Project, self).tasks(**self.task_filters)
 
     @lazy
     def members(self):
         "Retrieve members."
-        if 'members' in self.data and self.data['members']:
-            data = self.phab.user.query(phids=self.data['members'])
-            return self._build(User, data)
-        return []
+        return self.users(phids=self.data.get('members'))
         
     def __repr__(self):
         return "Project(%s)" % self.name   
-
-
-class Phabulous(PhabulousStart):
-    "Core interface for interacting with Phabulous."
-    pass
 
