@@ -25,6 +25,36 @@ class PhabulousStart(object):
         "Pluralize keys."
         return {'%ss' % x:(y,) for x, y in kwargs.iteritems()}
 
+class Task(PhabulousStart):
+    "Wrapper around Phab task response."
+    def __init__(self, data, *args, **kwargs):
+        super(Task, self).__init__(*args, **kwargs)
+        self.data = data
+        self.description = data['description']
+        self.title = data['title']
+        self.dependencies = data['dependsOnTaskPHIDs']
+        self.id = data['id']
+        self.priority = data['priority']
+        self.phid = data['phid']
+        self.status = data['statusName']
+        self.is_open = not self.data.get('isClosed')
+        self.is_closed = not self.is_open
+        #self.category = data.get('auxiliary', {}).get('uber:maniphest_categroy', '').split('|') or None
+        #self.owner_phid = data['ownerPHID']
+        #owner = retrieve_users(phids=[self.owner_phid])
+        #self.owner = owner.values()[0] if owner else None        
+        #self.projects = dict(retrieve_projects(phids=data['projectPHIDs'])).values()
+        
+        """
+        if 'std:maniphest:uber:estimate' in data:
+            self.estimate = int(data['std:maniphest:uber:estimate'])
+        else:
+            self.estimate = 1
+        """
+
+    def __repr__(self):
+        return "Task(T%s: %s)" % (self.id, self.title[:100])
+
 
 class User(PhabulousStart):
     "Wrapper around Phabricator user responses."
@@ -34,17 +64,16 @@ class User(PhabulousStart):
         self.data = data
         self.name = data['userName']
         self.phid = data['phid']
-        self._tasks = None
+        self.task_filters = {
+            'ownerPHIDs': (self.phid,),
+            'status': 'status-open',
+        }
 
-    def tasks(self, params=None):
+    @lazy
+    def tasks(self):
         "Retrieve tasks from Phabricator API for user."
-        if not self._tasks:
-            params = params if params else {}
-            params.setdefault('ownerPHIDs', (self.phid,))
-            params.setdefault('status', 'status-open')
-            self._tasks = list(retrieve_tasks(**params).itervalues())
-
-        return self._tasks
+        data = self.phab.maniphest.query(**self.task_filters).itervalues()
+        return self._build(Task, data)
     
     def __repr__(self):
         return "User(%s)" % (self.name,)

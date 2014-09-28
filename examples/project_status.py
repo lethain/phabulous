@@ -16,4 +16,5 @@ for attr in ('name', 'date_created', 'phid', 'id'):
 print "members:"
 for user in project.members:
     print "\t%s" % user.name
-
+    for task in user.tasks[:5]:
+        print "\t\t%s" % task.title
