@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='phabulous',
-    version='0.1',
+    version='0.1.1',
     author='Will Larson',
     author_email='lethain@gmail.com',
     packages=['phabulous', 'phabulous.tests'],
@@ -12,5 +12,6 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=[
         "phabricator",
+        "lazy",
         ],
 )
