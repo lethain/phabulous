@@ -30,10 +30,11 @@ The simplest way to install is via PyPi::
 
     pip install phabulous
 
-If you want to develop extraction, then after installing `lxml`,
-you can install from GitHub::
+If you want to develop extraction, you can install from GitHub::
 
-    git clone
+    git clone git@github.com:lethain/phabulous.git
+    # or
+    git clone https://github.com/lethain/phabulous.git
     cd phabulous
     virtualenv env
     . ./env/bin/activate
@@ -53,8 +54,8 @@ Usage
 You should be able to explore from any starting object across
 the graph of Phabricator stuff. Let's look at some examples.
 
-Note that authentication is handled by the underlying `python-phabricator`
-library, which by default uses your `~/.arcrc` files.
+Note that authentication is handled by the underlying ``python-phabricator``
+library, which by default uses your ``~/.arcrc`` files.
 
 First, let's start with a project::
 
@@ -75,4 +76,4 @@ But maybe you want to start with a user instead::
         for project in task.projects:
             print "\t\t%s" % project.name
 
-See more examples in `./examples`.
+See more examples in ``./examples``.
