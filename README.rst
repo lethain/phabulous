@@ -30,7 +30,7 @@ The simplest way to install is via PyPi::
 
     pip install phabulous
 
-If you want to develop extraction, you can install from GitHub::
+If you want to develop ``phabulous``, you can install from GitHub::
 
     git clone git@github.com:lethain/phabulous.git
     # or
