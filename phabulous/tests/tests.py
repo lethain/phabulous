@@ -19,7 +19,7 @@ class TestPhabulous(unittest.TestCase):
                     'id': '2',
                     'priority': 3,
                     'statusName': 'status-open',
-                    'phid': '2',
+                    'phid': 'phid-2',
                     'title': 'task',
                     'description': 'desc',
 
@@ -37,6 +37,17 @@ class TestPhabulous(unittest.TestCase):
             },
         })
         self.phab = phabulous.Phabulous(self.responses)
+
+    def test_task(self):
+        "Test the task object."
+        task = self.phab.task(phid='phid-2')
+        tasks = self.phab.tasks(phid=['phid-2'])
+
+        self.assertEquals(len(tasks), 1)
+        self.assertEquals(task.phid, tasks[0].phid)
+        self.assertEquals(task.phid, 'phid-2')
+        self.assertEquals(task.title, 'task')
+        self.assertEquals(task.dependencies, [])
 
     def test_project(self):
         "Test the project object."
