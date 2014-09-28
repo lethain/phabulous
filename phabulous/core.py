@@ -120,7 +120,7 @@ class User(Phabulous):
     def tasks(self):
         "Retrieve tasks from Phabricator API for user."
         return super(User, self).tasks(**self.task_filters)
-    
+
     def __repr__(self):
         return "User(%s)" % (self.name,)
 
@@ -150,7 +150,6 @@ class Project(Phabulous):
     def members(self):
         "Retrieve members."
         return self.users(phids=self.data.get('members'))
-        
-    def __repr__(self):
-        return "Project(%s)" % self.name   
 
+    def __repr__(self):
+        return "Project(%s)" % self.name
