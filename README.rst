@@ -72,7 +72,9 @@ But maybe you want to start with a user instead::
     print "Name: \t%s" % user.name
     print "Email: \t%s" % user.email
     for task in user.tasks[:10]:
+        deps = ",".join([x.title for x in task.dependencies])
         print "\t%s" % task.title
+        print "\tDependencies: %s" % deps
         for project in task.projects:
             print "\t\t%s" % project.name
 

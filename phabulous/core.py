@@ -39,7 +39,7 @@ class Phabulous(object):
     def tasks(self, **kwargs):
         "Retrieve tasks."
         if kwargs:
-            data = self.phab.maniphest.query(**self.task_filters).itervalues()
+            data = self.phab.maniphest.query(**kwargs).itervalues()
             return self._build(Task, data)
         return []
 
@@ -67,7 +67,6 @@ class Task(Phabulous):
         self.data = data
         self.description = data['description']
         self.title = data['title']
-        self.dependencies = data['dependsOnTaskPHIDs']
         self.id = data['id']
         self.priority = data['priority']
         self.phid = data['phid']
@@ -75,6 +74,15 @@ class Task(Phabulous):
         self.is_open = not self.data.get('isClosed')
         self.is_closed = not self.is_open
         self.auxiliary = data.get('auxiliary')
+
+    @lazy
+    def dependencies(self):
+        "Retrieve dependent tasks."
+        phids = self.data.get('dependsOnTaskPHIDs')
+        if phids:
+            return self.tasks(phids=phids)
+        return []
+
 
     @lazy
     def owner(self):
