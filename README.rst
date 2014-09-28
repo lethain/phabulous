@@ -3,19 +3,18 @@ phabulous
 =========
 
 Phabulous is an extremely simple wrapper around `python-phabricator <https://github.com/disqus/python-phabricator>`_,
-with the aim of creating a simpler, more Pythonic interface. I was motivated
-to put it together after copy-pasting the same set of classes across a dozen
-iPython notebooks which were all playing with Phabricator data.
+with the aim of supporting writing more concise, and perhaps more predictable
+code interacting with Phabricator's Conduit APIs.
 
-It is mostly focused oon reading and tabulating task data, it's not particularly
-concerned about doing anything else.
+I'm mostly using it to support writing iPython Notebooks which explore teams'
+work loads and project planning, so it really only supports read operations
+at this point.
 
 Simplest example::
 
     from phabulous import Phabulous
-    phab = Phabulous()
 
-    project = phab.project(id=481)
+    project = Phabulous().project(id=481)
     for task in project.tasks():
         print task.title, task.owner.name
 
@@ -48,11 +47,14 @@ Then you can run the tests::
 All of which should pass in a sane installation.
 
 
-Examples
-========
+Usage
+=====
 
 You should be able to explore from any starting object across
 the graph of Phabricator stuff. Let's look at some examples.
+
+Note that authentication is handled by the underlying `python-phabricator`
+library, which by default uses your `~/.arcrc` files.
 
 First, let's start with a project::
 
@@ -62,11 +64,15 @@ First, let's start with a project::
     for task in project.tasks[:5]:
         print "[%s] %s:\t%s" % (task.is_open, task.owner.name, task.title)
 
-But maybe you want to start with a user isntead::
+But maybe you want to start with a user instead::
 
-
-
-
-
+    import phabulous
+    user = phabulous.Phabulous().user(username='wlarson')
+    print "Name: \t%s" % user.name
+    print "Email: \t%s" % user.email
+    for task in user.tasks[:10]:
+        print "\t%s" % task.title
+        for project in task.projects:
+            print "\t\t%s" % project.name
 
 See more examples in `./examples`.
