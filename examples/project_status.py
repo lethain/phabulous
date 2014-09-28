@@ -5,10 +5,9 @@ import phabulous
 
 
 phab = phabulous.Phabulous()
-
 project = phab.project(id=481)
 
-# print out soem stuff
+# print out some stuff
 print "%s\b" % project
 for attr in ('name', 'date_created', 'phid', 'id'):
     print "%s: %s" % (attr.capitalize(), getattr(project, attr))

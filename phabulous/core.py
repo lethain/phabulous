@@ -25,9 +25,23 @@ class PhabulousStart(object):
         "Pluralize keys."
         return {'%ss' % x:(y,) for x, y in kwargs.iteritems()}
 
+    def projects(self, **kwargs):
+        "Retrieve projects."
+        if kwargs:
+            data = self.phab.project.query(**kwargs).data.itervalues()
+            return self._build(Project, data)
+        return {}
+
+    def project(self, **kwargs):
+        "Retrieve a project."
+        return first_or_none(self.projects(**self._pluralize(kwargs)))
+
+
+
 class Task(PhabulousStart):
-    "Wrapper around Phab task response."
+    "Wrapper around Maniphest task."
     def __init__(self, data, *args, **kwargs):
+        "Initialize Task."
         super(Task, self).__init__(*args, **kwargs)
         self.data = data
         self.description = data['description']
@@ -39,18 +53,18 @@ class Task(PhabulousStart):
         self.status = data['statusName']
         self.is_open = not self.data.get('isClosed')
         self.is_closed = not self.is_open
-        #self.category = data.get('auxiliary', {}).get('uber:maniphest_categroy', '').split('|') or None
-        #self.owner_phid = data['ownerPHID']
-        #owner = retrieve_users(phids=[self.owner_phid])
-        #self.owner = owner.values()[0] if owner else None        
-        #self.projects = dict(retrieve_projects(phids=data['projectPHIDs'])).values()
-        
-        """
-        if 'std:maniphest:uber:estimate' in data:
-            self.estimate = int(data['std:maniphest:uber:estimate'])
-        else:
-            self.estimate = 1
-        """
+        self.auxiliary = data.get('auxiliary')
+
+    @lazy
+    def owner(self):
+        "Retrieve owner user for a task."
+        data = self.phab.user.query(phids=(self.data['ownerPHID'],))
+        return first_or_none(self._build(User, data))
+
+    @lazy
+    def projects(self):
+        "Retrieve projects for a task."
+        return super(Task, self).projects(phids=data.get('projectPHIDs'))
 
     def __repr__(self):
         return "Task(T%s: %s)" % (self.id, self.title[:100])
@@ -90,6 +104,16 @@ class Project(PhabulousStart):
         self.date_created = data['dateCreated']
         self.slugs = data['slugs']
         self.date_modified = data['dateModified']
+        self.task_filters = {
+            'projectPHIDs': (self.phid,),
+            'status': 'status-open',
+        }
+
+    @lazy
+    def tasks(self):
+        "Retrieve tasks from Phabricator API for user."
+        data = self.phab.maniphest.query(**self.task_filters).itervalues()
+        return self._build(Task, data)
 
     @lazy
     def members(self):
@@ -105,14 +129,5 @@ class Project(PhabulousStart):
 
 class Phabulous(PhabulousStart):
     "Core interface for interacting with Phabulous."
-    def projects(self, **kwargs):
-        "Retrieve projects."
-        if kwargs:
-            data = self.phab.project.query(**kwargs).data.itervalues()
-            return self._build(Project, data)
-        return {}
-
-    def project(self, **kwargs):
-        "Retrieve a project."
-        return first_or_none(self.projects(**self._pluralize(kwargs)))
+    pass
 
