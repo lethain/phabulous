@@ -84,7 +84,11 @@ class Task(Phabulous):
     @lazy
     def projects(self):
         "Retrieve projects for a task."
-        return super(Task, self).projects(phids=data.get('projectPHIDs'))
+        phids = self.data.get('projectPHIDs')
+        if phids:
+            return super(Task, self).projects(phids=self.data.get('projectPHIDs'))
+        else:
+            return []
 
     def __repr__(self):
         return "Task(T%s: %s)" % (self.id, self.title[:100])
@@ -97,6 +101,7 @@ class User(Phabulous):
         super(User, self).__init__(*args, **kwargs)
         self.data = data
         self.name = data['userName']
+        self.email = data['email']
         self.phid = data['phid']
         self.task_filters = {
             'ownerPHIDs': (self.phid,),

@@ -12,12 +12,8 @@ concerned about doing anything else.
 
 Simplest example::
 
-    from phabricator import Phabricator
     from phabulous import Phabulous
-
-    # create a python-phabricator Phabricator object,
-    # this uses your ~/.arcrc file
-    phab = Phabulous(Phabricator())
+    phab = Phabulous()
 
     project = phab.project(id=481)
     for task in project.tasks():
@@ -54,5 +50,23 @@ All of which should pass in a sane installation.
 
 Examples
 ========
+
+You should be able to explore from any starting object across
+the graph of Phabricator stuff. Let's look at some examples.
+
+First, let's start with a project::
+
+    import phabulous
+    phab = phabulous.Phabulous()
+    project = phab.project(id=481)
+    for task in project.tasks[:5]:
+        print "[%s] %s:\t%s" % (task.is_open, task.owner.name, task.title)
+
+But maybe you want to start with a user isntead::
+
+
+
+
+
 
 See more examples in `./examples`.
