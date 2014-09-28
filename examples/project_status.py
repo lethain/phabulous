@@ -13,4 +13,7 @@ print "%s\b" % project
 for attr in ('name', 'date_created', 'phid', 'id'):
     print "%s: %s" % (attr.capitalize(), getattr(project, attr))
 
-print "members", project.members()
+print "members:"
+for user in project.members:
+    print "\t%s" % user.name
+

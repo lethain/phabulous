@@ -62,6 +62,7 @@ class Project(PhabulousStart):
         self.slugs = data['slugs']
         self.date_modified = data['dateModified']
 
+    @lazy
     def members(self):
         "Retrieve members."
         if 'members' in self.data and self.data['members']:
