@@ -1,1 +1,2 @@
-v0.1,   09/27/2014 -- Initial release.
+v0.1.3,   09/28/2014 -- Add tests.
+v0.1.0,   09/27/2014 -- Initial release.

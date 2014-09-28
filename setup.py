@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='phabulous',
-    version='0.1.2',
+    version='0.1.3',
     author='Will Larson',
     author_email='lethain@gmail.com',
     packages=['phabulous', 'phabulous.tests'],
