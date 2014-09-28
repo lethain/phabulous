@@ -43,7 +43,8 @@ If you want to develop extraction, you can install from GitHub::
 
 Then you can run the tests::
 
-    python tests/tests.py
+    pip install mock
+    python phabulous/tests/tests.py
 
 All of which should pass in a sane installation.
 
